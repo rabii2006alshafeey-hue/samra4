@@ -100,12 +100,18 @@
       .no-print {
         display: none !important;
       }
+      #invoice-scale-wrapper {
+        width: 100% !important;
+        height: auto !important;
+        overflow: visible !important;
+      }
       #invoice-printable-sheet {
         box-shadow: none !important;
         border: none !important;
         max-width: 100% !important;
         width: 100% !important;
         min-height: 278mm !important;
+        transform: none !important;
         margin: 0 auto !important;
         padding: 0 !important;
         -webkit-print-color-adjust: exact !important;
@@ -531,40 +537,40 @@
   </div>
 
   <!-- نافذة عرض وطباعة الفاتورة على ورقة A4 بالتصميم المرفق -->
-  <div id="invoice-print-modal" class="fixed inset-0 z-50 hidden items-start justify-center p-3 sm:p-6 bg-slate-900/70 backdrop-blur-xs overflow-y-auto">
-    <div class="w-full max-w-[210mm] my-auto space-y-3">
+  <div id="invoice-print-modal" class="fixed inset-0 z-50 hidden items-start justify-center p-2 sm:p-6 bg-slate-900/75 backdrop-blur-xs overflow-y-auto overflow-x-hidden">
+    <div class="w-full max-w-[210mm] mx-auto my-auto space-y-2.5 sm:space-y-3">
       <!-- شريط أزرار التحكم أعلى المعاينة (لا يظهر عند الطباعة) -->
-      <div class="no-print bg-white/95 backdrop-blur-md rounded-2xl px-4 py-3 shadow-lg border border-slate-200 flex flex-wrap items-center justify-between gap-3">
+      <div class="no-print bg-white/95 backdrop-blur-md rounded-2xl px-3.5 sm:px-4 py-2.5 sm:py-3 shadow-lg border border-slate-200 flex flex-wrap items-center justify-between gap-2.5">
         <div class="flex items-center gap-2">
-          <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
-          <span class="text-xs sm:text-sm font-extrabold text-slate-800">معاينة الفاتورة الجاهزة للطباعة (مقاس ورقة A4)</span>
+          <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 shrink-0"></span>
+          <span class="text-xs sm:text-sm font-extrabold text-slate-800">معاينة الفاتورة (مقاس ورقة A4)</span>
         </div>
-        <div class="flex items-center gap-2">
-          <button id="close-print-modal-btn" type="button" class="px-4 py-2 rounded-xl border border-slate-200 bg-white text-slate-700 text-xs sm:text-sm font-bold hover:bg-slate-50 transition cursor-pointer">إغلاق</button>
-          <button id="trigger-window-print-btn" type="button" class="inline-flex items-center gap-2 px-5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs sm:text-sm font-extrabold transition shadow-md shadow-indigo-600/20 cursor-pointer">
+        <div class="flex items-center gap-2 w-full sm:w-auto justify-end">
+          <button id="close-print-modal-btn" type="button" class="flex-1 sm:flex-initial px-3.5 py-2 rounded-xl border border-slate-200 bg-white text-slate-700 text-xs sm:text-sm font-bold hover:bg-slate-50 transition cursor-pointer">إغلاق</button>
+          <button id="trigger-window-print-btn" type="button" class="flex-1 sm:flex-initial inline-flex items-center justify-center gap-2 px-4 sm:px-5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs sm:text-sm font-extrabold transition shadow-md shadow-indigo-600/20 cursor-pointer">
             <i data-lucide="printer" class="w-4 h-4"></i>
-            <span>طباعة على ورق A4</span>
+            <span>طباعة A4</span>
           </button>
         </div>
       </div>
 
-      <!-- ورقة الفاتورة A4 -->
-      <div id="invoice-printable-sheet" class="bg-white w-full max-w-[210mm] min-h-[280mm] mx-auto shadow-2xl border border-slate-300 flex flex-col justify-between text-[#0f2964] overflow-hidden">
-        <div>
-          <!-- ترويسة الشركة العلوية -->
-          <div class="px-6 pt-5 pb-3 border-b-4 border-[#163a84]">
-            <div class="flex items-center justify-between gap-4">
-              <!-- اسم الشركة بالعربية والإنجليزية -->
-              <div class="text-right">
-                <h1 class="text-2xl sm:text-3xl font-black text-[#122e6b] tracking-tight leading-snug">الميناوي لقطع السيارات</h1>
-                <p class="text-base sm:text-xl font-extrabold text-[#122e6b] tracking-wide mt-0.5" dir="ltr">AL MINAWE For Spare Parts</p>
-              </div>
+      <!-- حاوية تحجيم ذكية لتناسب شاشة الهاتف بالكامل دون قصّ أو تشوه -->
+      <div id="invoice-scale-wrapper" class="w-full overflow-hidden flex justify-center">
+        <!-- ورقة الفاتورة A4 -->
+        <div id="invoice-printable-sheet" class="bg-white w-[210mm] min-w-[210mm] min-h-[280mm] shrink-0 shadow-2xl border border-slate-300 flex flex-col justify-between text-[#0f2964] overflow-hidden origin-top">
+          <div>
+            <!-- ترويسة الشركة العلوية -->
+            <div class="px-6 pt-5 pb-3 border-b-4 border-[#163a84]">
+              <div class="flex items-center justify-between gap-4">
+                <!-- اسم الشركة بالعربية والإنجليزية -->
+                <div class="text-right">
+                  <h1 class="text-3xl font-black text-[#122e6b] tracking-tight leading-snug">الميناوي لقطع السيارات</h1>
+                  <p class="text-xl font-extrabold text-[#122e6b] tracking-wide mt-0.5" dir="ltr">AL MINAWE For Spare Parts</p>
+                </div>
 
-              <!-- أيقونة الشاحنة SVG مطابقة للهوية -->
-              <div class="w-44 sm:w-52 shrink-0">
-                <svg viewBox="0 0 260 110" class="w-full h-auto" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M12 96H248" stroke="#122e6b" stroke-width="3" stroke-linecap="round"/>
-                  <path d="M28 102H232" stroke="#1d4ed8" stroke-width="1.8" stroke-linecap="round"/>
+                <!-- أيقونة الشاحنة SVG مطابقة للهوية -->
+                <div class="w-52 shrink-0">
+                  <svg viewBox="0 0 260 110" class="w-full h-auto" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <!-- صندوق الشاحنة -->
                   <path d="M24 26L116 14V78H24V26Z" fill="#eff6ff" stroke="#122e6b" stroke-width="2.5" stroke-linejoin="round"/>
                   <line x1="34" y1="33" x2="108" y2="24" stroke="#122e6b" stroke-width="1.6"/>
@@ -642,7 +648,7 @@
             </div>
 
             <!-- سطر اسم العميل ورقم الفاتورة والتاريخ -->
-            <div class="mt-3 flex flex-wrap items-end justify-between gap-4 text-xs sm:text-sm font-extrabold text-slate-900">
+            <div class="mt-3 flex items-end justify-between gap-4 text-sm font-extrabold text-slate-900">
               <div class="flex items-center gap-2">
                 <span class="text-[#122e6b]">اسم العميل:</span>
                 <span id="print-inv-customer" class="font-black text-slate-950 border-b border-dashed border-slate-400 pb-0.5 min-w-[180px]">عميل نقدي</span>
@@ -674,7 +680,7 @@
                 </svg>
               </div>
 
-              <table class="w-full text-center border-collapse relative z-10 text-xs sm:text-sm">
+              <table class="w-full text-center border-collapse relative z-10 text-sm">
                 <thead>
                   <tr class="bg-[#163a84] text-white font-extrabold">
                     <th class="py-2 px-2 border-l border-white/30 w-12">التسلسل</th>
@@ -688,18 +694,6 @@
                 </thead>
                 <tbody id="print-inv-items" class="divide-y divide-[#122e6b]/30 font-bold text-slate-900"></tbody>
               </table>
-
-              <!-- قسم توقيع المعتمد أسفل يسار الجدول -->
-              <div class="relative z-10 px-6 pb-4 pt-6 flex justify-end">
-                <div class="text-center w-52">
-                  <p class="text-xs font-extrabold text-slate-700">ـــــــــــ توقيع المعتمد ـــــــــــ</p>
-                  <p class="text-base font-black text-[#122e6b] italic mt-1">أشرف محمود الميناوي</p>
-                  <p class="text-xs font-extrabold text-[#122e6b] mt-0.5 flex items-center justify-center gap-1" dir="ltr">
-                    <span>📞</span>
-                    <span>0792056165</span>
-                  </p>
-                </div>
-              </div>
             </div>
           </div>
         </div>
@@ -753,55 +747,74 @@
 
           <!-- الشريط الأزرق السفلي للعنوان والهواتف -->
           <div class="bg-[#163a84] text-white px-6 py-2.5 text-center space-y-1">
-            <div class="flex flex-wrap items-center justify-center gap-4 text-xs sm:text-sm font-extrabold">
+            <div class="flex items-center justify-center gap-4 text-sm font-extrabold">
               <span>عمان - أبو علندا - خلف محطة المشراوي</span>
               <span>|</span>
               <span dir="ltr">📞 0792056165</span>
               <span>|</span>
               <span dir="ltr">☎️ 06 412 5771</span>
             </div>
-            <p class="text-[10px] sm:text-[11px] font-semibold text-blue-100" dir="ltr">
+            <p class="text-[11px] font-semibold text-blue-100" dir="ltr">
               Amman - Abu Alanda - Behind Al-Mashharawi Station - P.O.Box 52 Amman Abu Alanda 11592 Jordan
             </p>
           </div>
         </div>
       </div>
+      </div>
     </div>
   </div>
 
-  <!-- نافذة تأكيد مخصصة بدون alert أو confirm -->
+  <!-- نافذة تأكيد الإجراءات -->
   <div id="confirm-modal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-slate-900/50 backdrop-blur-xs">
-    <div class="bg-white rounded-2xl max-w-sm w-full p-6 shadow-2xl border border-slate-100 animate-fade-in">
-      <div class="w-11 h-11 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center mb-4">
-        <i data-lucide="alert-circle" class="w-6 h-6"></i>
+    <div class="bg-white rounded-2xl max-w-sm w-full p-6 shadow-2xl border border-slate-100 animate-fade-in space-y-4">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center shrink-0">
+          <i data-lucide="alert-circle" class="w-5 h-5"></i>
+        </div>
+        <h3 id="confirm-modal-title" class="text-base font-extrabold text-slate-900">تأكيد الإجراء</h3>
       </div>
-      <h3 id="confirm-modal-title" class="text-base font-extrabold text-slate-900">تأكيد الإجراء</h3>
-      <p id="confirm-modal-message" class="text-sm text-slate-600 mt-1.5 leading-relaxed"></p>
-      <div class="mt-6 flex items-center justify-end gap-2">
-        <button id="confirm-cancel-btn" type="button" class="px-4 py-2 rounded-xl border border-slate-200 text-slate-700 text-xs sm:text-sm font-bold hover:bg-slate-50 transition">إلغاء</button>
-        <button id="confirm-ok-btn" type="button" class="px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs sm:text-sm font-bold transition">تأكيد</button>
+      <p id="confirm-modal-message" class="text-xs sm:text-sm text-slate-600 leading-relaxed"></p>
+      <div class="pt-2 flex items-center justify-end gap-2">
+        <button id="confirm-cancel-btn" type="button" class="px-4 py-2 rounded-xl border border-slate-200 text-slate-700 text-xs sm:text-sm font-bold hover:bg-slate-50 transition cursor-pointer">إلغاء</button>
+        <button id="confirm-ok-btn" type="button" class="px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs sm:text-sm font-extrabold transition cursor-pointer">تأكيد</button>
       </div>
     </div>
   </div>
 
   <script>
-    /**
-     * نظام إدارة المخزن (Warehouse Management System)
-     */
-    const STORAGE_KEY = 'wms_alminawe_data_v1';
+    const STORAGE_KEY = 'alminawe_wms_data_v1';
 
     function formatDateTimeNow() {
       const now = new Date();
-      const date = now.toLocaleDateString('ar-EG', {
-        year: 'numeric',
-        month: '2-digit',
-        day: '2-digit'
-      });
-      const time = now.toLocaleTimeString('ar-EG', {
-        hour: '2-digit',
-        minute: '2-digit'
-      });
-      return `${date} - ${time}`;
+      const yyyy = now.getFullYear();
+      const mm = String(now.getMonth() + 1).padStart(2, '0');
+      const dd = String(now.getDate()).padStart(2, '0');
+      let hours = now.getHours();
+      const minutes = String(now.getMinutes()).padStart(2, '0');
+      const period = hours >= 12 ? 'م' : 'ص';
+      hours = hours % 12 || 12;
+      return `${yyyy}/${mm}/${dd} - ${String(hours).padStart(2, '0')}:${minutes} ${period}`;
+    }
+
+    function fitInvoicePreviewToScreen() {
+      const modal = document.getElementById('invoice-print-modal');
+      const wrapper = document.getElementById('invoice-scale-wrapper');
+      const sheet = document.getElementById('invoice-printable-sheet');
+      if (!modal || !wrapper || !sheet || modal.classList.contains('hidden')) return;
+
+      sheet.style.transform = 'none';
+      wrapper.style.height = 'auto';
+
+      const availableWidth = wrapper.clientWidth;
+      const sheetWidth = sheet.offsetWidth;
+      const sheetHeight = sheet.offsetHeight;
+
+      if (availableWidth > 0 && sheetWidth > availableWidth) {
+        const scale = availableWidth / sheetWidth;
+        sheet.style.transformOrigin = 'top center';
+        sheet.style.transform = `scale(${scale})`;
+        wrapper.style.height = `${Math.ceil(sheetHeight * scale)}px`;
+      }
     }
 
     // بيانات تجريبية أولية متناسقة وتحتوي على حقل (البلد المنشأ)
@@ -1237,6 +1250,7 @@
       modal.classList.remove('hidden');
       modal.classList.add('flex');
       if (window.lucide) lucide.createIcons();
+      requestAnimationFrame(fitInvoicePreviewToScreen);
     }
 
     function closeInvoicePrintModal() {
@@ -1839,7 +1853,7 @@
       document.getElementById('trigger-window-print-btn').addEventListener('click', () => {
         window.print();
       });
-
+      window.addEventListener('resize', fitInvoicePreviewToScreen);
       // استعادة البيانات التجريبية
       document.getElementById('reset-data-btn').addEventListener('click', () => {
         openConfirmModal(
