@@ -141,10 +141,10 @@
 
       <!-- إجراءات سريعة في الهيدر -->
       <div class="flex items-center gap-2 sm:gap-2.5">
-        <div id="cloud-sync-badge" class="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl text-[11px] sm:text-xs font-bold bg-amber-50 border border-amber-200 text-amber-700" title="حالة المزامنة السحابية بين الأجهزة">
+        <button id="cloud-sync-badge" type="button" class="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl text-[11px] sm:text-xs font-bold bg-amber-50 border border-amber-200 text-amber-700 hover:opacity-90 transition cursor-pointer" title="انقر لإعداد أو فحص المزامنة السحابية بين الأجهزة">
           <span id="cloud-sync-dot" class="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span>
           <span id="cloud-sync-text">جاري الاتصال...</span>
-        </div>
+        </button>
 
         <button id="reset-data-btn" type="button" class="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs sm:text-sm font-semibold bg-white border border-slate-200 text-rose-600 hover:bg-rose-50 hover:border-rose-200 transition shadow-2xs" title="استعادة البيانات التجريبية">
           <i data-lucide="rotate-ccw" class="w-4 h-4"></i>
@@ -712,22 +712,62 @@
     </div>
   </div>
 
+  <!-- نافذة إعداد الربط السحابي بين اللابتوب والهواتف -->
+  <div id="cloud-config-modal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-slate-900/50 backdrop-blur-xs">
+    <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-slate-100 animate-fade-in">
+      <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+        <div class="flex items-center gap-2">
+          <div class="w-9 h-9 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center">
+            <i data-lucide="cloud" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <h3 class="text-base font-extrabold text-slate-900">إعداد المزامنة السحابية بين الأجهزة</h3>
+            <p class="text-xs text-slate-500">لربط اللابتوب والهواتف بقاعدة بيانات سحابية واحدة</p>
+          </div>
+        </div>
+        <button id="close-cloud-modal" type="button" class="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <div class="mt-4 space-y-3 text-xs text-slate-600 leading-relaxed">
+        <div class="p-3 rounded-xl bg-amber-50 border border-amber-200/80 text-amber-900">
+          <strong>لماذا يظهر "وضع محلي (جهاز واحد)"؟</strong><br />
+          عند فتح الملف مباشرة دون إعدادات سحابة مُسبقة، يعمل النظام تلقائياً بذاكرة الجهاز الحالي حتى لا يتوقف عملك. لمزامنة البيانات بين اللابتوب والهاتف، الصق إعدادات <strong>Firebase Config</strong> الخاصة بك أدناه في كلا الجهازين:
+        </div>
+
+        <div>
+          <label for="firebase-config-textarea" class="block text-xs font-extrabold text-slate-800 mb-1">إعدادات الربط السحابي (JSON Config)</label>
+          <textarea id="firebase-config-textarea" rows="5" dir="ltr" placeholder='{"apiKey": "...", "authDomain": "...", "projectId": "...", "storageBucket": "...", "messagingSenderId": "...", "appId": "..."}' class="w-full p-3 rounded-xl bg-slate-50 border border-slate-200 font-mono text-xs text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500 focus:bg-white"></textarea>
+        </div>
+      </div>
+
+      <div class="mt-5 flex items-center justify-end gap-2">
+        <button id="cancel-cloud-modal" type="button" class="px-4 py-2 rounded-xl border border-slate-200 text-slate-700 text-xs sm:text-sm font-bold hover:bg-slate-50 transition">إغلاق</button>
+        <button id="save-cloud-config-btn" type="button" class="px-5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs sm:text-sm font-extrabold transition shadow-md shadow-indigo-600/20">تفعيل المزامنة السحابية</button>
+      </div>
+    </div>
+  </div>
+
   <script type="module">
     /**
      * نظام إدارة المخزن (Warehouse Management System)
-     * مزود بالمزامنة السحابية الفورية للعمل على اللابتوب وعدة هواتف في وقت واحد.
+     * يدعم المزامنة السحابية الفورية بين الأجهزة مع وضع تشغيل محلي تلقائي كبديل آمن.
      */
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+    import { initializeApp, getApps, deleteApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
     import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
     import { getFirestore, doc, setDoc, updateDoc, deleteDoc, onSnapshot, collection } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
     const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-    const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : null;
+    let runtimeFirebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : null;
 
     let db = null;
     let auth = null;
     let currentUser = null;
+    let isCloudConnected = false;
     let isSeedingInitialData = false;
+    let unsubProducts = null;
+    let unsubInvoices = null;
 
     function updateSyncStatus(status, label) {
       const badge = document.getElementById('cloud-sync-badge');
@@ -736,12 +776,15 @@
       if (!badge || !dot || !text) return;
 
       text.textContent = label;
-      badge.className = 'inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl text-[11px] sm:text-xs font-bold border transition';
+      badge.className = 'inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl text-[11px] sm:text-xs font-bold border transition cursor-pointer';
       dot.className = 'w-2 h-2 rounded-full';
 
       if (status === 'connected') {
         badge.classList.add('bg-emerald-50', 'border-emerald-200', 'text-emerald-700');
         dot.classList.add('bg-emerald-500');
+      } else if (status === 'local') {
+        badge.classList.add('bg-sky-50', 'border-sky-200', 'text-sky-700');
+        dot.classList.add('bg-sky-500');
       } else if (status === 'error') {
         badge.classList.add('bg-rose-50', 'border-rose-200', 'text-rose-700');
         dot.classList.add('bg-rose-500');
@@ -812,56 +855,36 @@
           },
           {
             id: 'prd-106',
-            name: 'كراتين شحن مقوى كبير',
-            country: 'تركيا',
-            quantity: 12,
-            minStock: 15,
-            unitPrice: 3.25
-          },
-          {
-            id: 'prd-107',
-            name: 'فأرة لاسلكية مريحة',
-            country: 'الولايات المتحدة',
-            quantity: 34,
+            name: 'كابل شبكة Cat6 بطول 10 متر',
+            country: 'الصين',
+            quantity: 35,
             minStock: 10,
-            unitPrice: 22
-          },
-          {
-            id: 'prd-108',
-            name: 'شريط لاصق شفاف للتغليف',
-            country: 'إيطاليا',
-            quantity: 48,
-            minStock: 12,
-            unitPrice: 1.75
+            unitPrice: 8.5
           }
         ],
         invoices: [
           {
             id: '9655',
             customerName: 'محل أشرف محمود الميناوي لقطع غيار كهرباء السيارات',
-            dateTime: formatDateTimeNow(),
-            createdAt: Date.now(),
+            dateTime: '2026/11/24 - 10:30',
+            createdAt: Date.now() - 86400000,
             items: [
               {
-                productId: 'prd-107',
-                name: 'فأرة لاسلكية مريحة',
-                country: 'الولايات المتحدة',
-                quantity: 2,
-                unitPrice: 22,
-                subtotal: 44
+                productId: 'prd-103',
+                name: 'رزمة ورق A4 (500 ورقة)',
+                country: 'الأردن',
+                quantity: 10,
+                unitPrice: 5.5,
+                subtotal: 55
               }
             ],
-            total: 44
+            total: 55
           }
         ]
       };
     }
 
-    let state = {
-      activeTab: 'dashboard',
-      products: [],
-      invoices: []
-    };
+    let state = createSeedData();
     let salesCart = {};
     let salesSearchQuery = '';
     let lastCreatedInvoiceId = null;
@@ -871,59 +894,84 @@
       return collection(db, 'artifacts', appId, 'public', 'data', 'wms_products');
     }
 
-    function getProductDocRef(productId) {
-      return doc(db, 'artifacts', appId, 'public', 'data', 'wms_products', productId);
-    }
-
     function getInvoicesCollectionRef() {
       return collection(db, 'artifacts', appId, 'public', 'data', 'wms_invoices');
+    }
+
+    function getProductDocRef(productId) {
+      return doc(db, 'artifacts', appId, 'public', 'data', 'wms_products', productId);
     }
 
     function getInvoiceDocRef(invoiceId) {
       return doc(db, 'artifacts', appId, 'public', 'data', 'wms_invoices', invoiceId);
     }
 
-    async function seedCloudDatabase(forceReset = false) {
+    async function seedCloudDatabase(forceOverwrite = false) {
       if (!db || !currentUser || isSeedingInitialData) return;
       isSeedingInitialData = true;
       try {
         const seed = createSeedData();
-        if (forceReset) {
-          for (const p of state.products) {
-            await deleteDoc(getProductDocRef(p.id));
+
+        if (forceOverwrite) {
+          for (const existing of state.products) {
+            await deleteDoc(getProductDocRef(existing.id));
           }
-          for (const inv of state.invoices) {
-            await deleteDoc(getInvoiceDocRef(inv.id));
+          for (const existingInv of state.invoices) {
+            await deleteDoc(getInvoiceDocRef(existingInv.id));
           }
         }
-        for (const prod of seed.products) {
-          await setDoc(getProductDocRef(prod.id), {
-            ...prod,
-            updatedAt: Date.now()
+
+        const now = Date.now();
+        for (let i = 0; i < seed.products.length; i++) {
+          const p = seed.products[i];
+          await setDoc(getProductDocRef(p.id), {
+            ...p,
+            updatedAt: now - i * 1000
           });
         }
-        for (const inv of seed.invoices) {
-          await setDoc(getInvoiceDocRef(inv.id), inv);
+
+        for (let i = 0; i < seed.invoices.length; i++) {
+          const inv = seed.invoices[i];
+          await setDoc(getInvoiceDocRef(inv.id), {
+            ...inv,
+            items: JSON.stringify(inv.items),
+            createdAt: now - i * 1000
+          });
         }
       } catch (err) {
         console.error('Seed cloud error:', err);
-        showToast('تعذر تهيئة البيانات السحابية', 'error');
+        showToast('تعذر تهيئة البيانات الافتراضية على السحابة', 'error');
       } finally {
         isSeedingInitialData = false;
       }
     }
 
-    async function initCloudSync() {
-      if (!firebaseConfig) {
-        updateSyncStatus('error', 'وضع غير متصل');
-        state = createSeedData();
+    async function initCloudSync(customConfig = null) {
+      if (customConfig) {
+        runtimeFirebaseConfig = customConfig;
+      }
+
+      if (!runtimeFirebaseConfig) {
+        isCloudConnected = false;
+        updateSyncStatus('local', 'وضع محلي (اضغط للربط السحابي)');
+        if (state.products.length === 0 && state.invoices.length === 0) {
+          state = createSeedData();
+        }
         renderAll();
         return;
       }
 
       try {
         updateSyncStatus('connecting', 'جاري الاتصال بالسحابة...');
-        const app = initializeApp(firebaseConfig);
+        if (unsubProducts) unsubProducts();
+        if (unsubInvoices) unsubInvoices();
+
+        const existingApps = getApps();
+        for (const existing of existingApps) {
+          await deleteApp(existing);
+        }
+
+        const app = initializeApp(runtimeFirebaseConfig);
         db = getFirestore(app);
         auth = getAuth(app);
 
@@ -935,6 +983,7 @@
         currentUser = auth.currentUser;
 
         if (!currentUser) {
+          isCloudConnected = false;
           updateSyncStatus('error', 'تعذر المصادقة');
           return;
         }
@@ -942,7 +991,7 @@
         let productsLoaded = false;
         let invoicesLoaded = false;
 
-        onSnapshot(
+        unsubProducts = onSnapshot(
           getProductsCollectionRef(),
           async (snapshot) => {
             const list = [];
@@ -952,6 +1001,7 @@
             list.sort((a, b) => (Number(b.updatedAt) || 0) - (Number(a.updatedAt) || 0));
             state.products = list;
             productsLoaded = true;
+            isCloudConnected = true;
             updateSyncStatus('connected', 'متصل ومُزامَن سحابياً');
             renderAll();
 
@@ -961,12 +1011,13 @@
           },
           (error) => {
             console.error('Products snapshot error:', error);
+            isCloudConnected = false;
             updateSyncStatus('error', 'خطأ في المزامنة');
             showToast('حدث خطأ أثناء مزامنة الأصناف', 'error');
           }
         );
 
-        onSnapshot(
+        unsubInvoices = onSnapshot(
           getInvoicesCollectionRef(),
           (snapshot) => {
             const list = [];
@@ -990,8 +1041,9 @@
         );
       } catch (err) {
         console.error('Firebase init error:', err);
+        isCloudConnected = false;
         updateSyncStatus('error', 'تعذر الاتصال بالسحابة');
-        showToast('تعذر الاتصال بقاعدة البيانات السحابية', 'error');
+        showToast('تأكد من صحة إعدادات Firebase Config', 'error');
       }
     }
 
@@ -1378,14 +1430,20 @@
               'حذف الصنف',
               `هل أنت متأكد من حذف الصنف "${prod.name}" نهائياً من المخزن؟`,
               async () => {
-                if (!db || !currentUser) return;
-                try {
-                  await deleteDoc(getProductDocRef(id));
+                if (isCloudConnected && db && currentUser) {
+                  try {
+                    await deleteDoc(getProductDocRef(id));
+                    delete salesCart[id];
+                    showToast(`تم حذف الصنف "${prod.name}" ومزامنة التحديث`, 'success');
+                  } catch (err) {
+                    console.error('Delete product error:', err);
+                    showToast('تعذر حذف الصنف من السحابة', 'error');
+                  }
+                } else {
+                  state.products = state.products.filter((item) => item.id !== id);
                   delete salesCart[id];
-                  showToast(`تم حذف الصنف "${prod.name}" ومزامنة التحديث`, 'success');
-                } catch (err) {
-                  console.error('Delete product error:', err);
-                  showToast('تعذر حذف الصنف من السحابة', 'error');
+                  renderAll();
+                  showToast(`تم حذف الصنف "${prod.name}"`, 'success');
                 }
               }
             );
@@ -1647,11 +1705,6 @@
       }
 
       async function completeSale() {
-        if (!db || !currentUser) {
-          showToast('يرجى الانتظار حتى يكتمل الاتصال بالسحابة', 'warning');
-          return;
-        }
-
         const entries = Object.entries(salesCart)
           .map(([productId, qty]) => {
             const prod = state.products.find((p) => p.id === productId);
@@ -1688,10 +1741,14 @@
 
           for (const { prod, qty } of entries) {
             const updatedQty = Math.max(0, Number(prod.quantity) - qty);
-            await updateDoc(getProductDocRef(prod.id), {
-              quantity: updatedQty,
-              updatedAt: Date.now()
-            });
+            if (isCloudConnected && db && currentUser) {
+              await updateDoc(getProductDocRef(prod.id), {
+                quantity: updatedQty,
+                updatedAt: Date.now()
+              });
+            } else {
+              prod.quantity = updatedQty;
+            }
 
             const subtotal = qty * Number(prod.unitPrice || 0);
             invoiceTotal += subtotal;
@@ -1715,7 +1772,12 @@
             total: invoiceTotal
           };
 
-          await setDoc(getInvoiceDocRef(invoiceId), newInvoice);
+          if (isCloudConnected && db && currentUser) {
+            await setDoc(getInvoiceDocRef(invoiceId), newInvoice);
+          } else {
+            state.invoices.unshift(newInvoice);
+            renderAll();
+          }
 
           lastCreatedInvoiceId = invoiceId;
           salesCart = {};
@@ -1724,7 +1786,7 @@
 
           const banner = document.getElementById('sale-success-banner');
           document.getElementById('sale-success-title').textContent = `تم إصدار فاتورة العميل: ${customerName} (#${invoiceId})`;
-          document.getElementById('sale-success-subtitle').textContent = `الإجمالي: ${formatCurrency(invoiceTotal)} — تم خصم الكميات ومزامنتها على جميع الأجهزة.`;
+          document.getElementById('sale-success-subtitle').textContent = `الإجمالي: ${formatCurrency(invoiceTotal)} — تم خصم الكميات من المخزن بنجاح.`;
           banner.classList.remove('hidden');
           banner.classList.add('flex');
 
@@ -1769,10 +1831,6 @@
 
         document.getElementById('product-form').addEventListener('submit', async (e) => {
           e.preventDefault();
-          if (!db || !currentUser) {
-            showToast('يرجى الانتظار حتى يكتمل الاتصال بالسحابة', 'warning');
-            return;
-          }
 
           const editId = document.getElementById('product-edit-id').value;
           const name = document.getElementById('prod-name').value.trim();
@@ -1787,34 +1845,93 @@
           }
 
           try {
-            if (editId) {
-              await updateDoc(getProductDocRef(editId), {
-                name,
-                country,
-                quantity,
-                minStock,
-                unitPrice,
-                updatedAt: Date.now()
-              });
-              showToast(`تم تحديث الصنف "${name}" ومزامنته`, 'success');
+            if (isCloudConnected && db && currentUser) {
+              if (editId) {
+                await updateDoc(getProductDocRef(editId), {
+                  name,
+                  country,
+                  quantity,
+                  minStock,
+                  unitPrice,
+                  updatedAt: Date.now()
+                });
+                showToast(`تم تحديث الصنف "${name}" ومزامنته`, 'success');
+              } else {
+                const newId = 'prd-' + Date.now();
+                await setDoc(getProductDocRef(newId), {
+                  id: newId,
+                  name,
+                  country,
+                  quantity,
+                  minStock,
+                  unitPrice,
+                  updatedAt: Date.now()
+                });
+                showToast(`تمت إضافة الصنف "${name}" ومزامنته`, 'success');
+              }
             } else {
-              const newId = 'prd-' + Date.now();
-              await setDoc(getProductDocRef(newId), {
-                id: newId,
-                name,
-                country,
-                quantity,
-                minStock,
-                unitPrice,
-                updatedAt: Date.now()
-              });
-              showToast(`تمت إضافة الصنف "${name}" ومزامنته`, 'success');
+              if (editId) {
+                const idx = state.products.findIndex((p) => p.id === editId);
+                if (idx !== -1) {
+                  state.products[idx] = { ...state.products[idx], name, country, quantity, minStock, unitPrice };
+                }
+                showToast(`تم تحديث الصنف "${name}"`, 'success');
+              } else {
+                state.products.unshift({
+                  id: 'prd-' + Date.now(),
+                  name,
+                  country,
+                  quantity,
+                  minStock,
+                  unitPrice
+                });
+                showToast(`تمت إضافة الصنف "${name}"`, 'success');
+              }
+              renderAll();
             }
 
             closeProductModal();
           } catch (err) {
             console.error('Save product error:', err);
-            showToast('حدث خطأ أثناء حفظ الصنف في السحابة', 'error');
+            showToast('حدث خطأ أثناء حفظ الصنف', 'error');
+          }
+        });
+
+        // نافذة إعداد المزامنة السحابية
+        const cloudModal = document.getElementById('cloud-config-modal');
+        document.getElementById('cloud-sync-badge').addEventListener('click', () => {
+          const textarea = document.getElementById('firebase-config-textarea');
+          if (runtimeFirebaseConfig && textarea) {
+            textarea.value = JSON.stringify(runtimeFirebaseConfig, null, 2);
+          }
+          cloudModal.classList.remove('hidden');
+          cloudModal.classList.add('flex');
+        });
+        document.getElementById('close-cloud-modal').addEventListener('click', () => {
+          cloudModal.classList.add('hidden');
+          cloudModal.classList.remove('flex');
+        });
+        document.getElementById('cancel-cloud-modal').addEventListener('click', () => {
+          cloudModal.classList.add('hidden');
+          cloudModal.classList.remove('flex');
+        });
+        document.getElementById('save-cloud-config-btn').addEventListener('click', async () => {
+          const raw = document.getElementById('firebase-config-textarea').value.trim();
+          if (!raw) {
+            showToast('يرجى لصق كود إعدادات Firebase Config أولاً', 'warning');
+            return;
+          }
+          try {
+            const parsed = JSON.parse(raw);
+            if (!parsed.apiKey || !parsed.projectId) {
+              showToast('إعدادات غير مكتملة: تأكد من وجود apiKey و projectId', 'error');
+              return;
+            }
+            cloudModal.classList.add('hidden');
+            cloudModal.classList.remove('flex');
+            await initCloudSync(parsed);
+          } catch (e) {
+            showToast('صيغة JSON غير صحيحة، تأكد من نسخ الكود كاملاً بين القوسين { }', 'error');
           }
         });
 
@@ -1867,13 +1984,20 @@
         document.getElementById('reset-data-btn').addEventListener('click', () => {
           openConfirmModal(
             'استعادة البيانات التجريبية',
-            'سيتم استبدال البيانات السحابية الحالية بالقائمة الافتراضية للأصناف والفواتير على جميع الأجهزة.',
+            'سيتم استبدال البيانات الحالية بالقائمة الافتراضية للأصناف والفواتير.',
             async () => {
               salesCart = {};
               lastCreatedInvoiceId = null;
               document.getElementById('sale-success-banner').classList.add('hidden');
               document.getElementById('sale-success-banner').classList.remove('flex');
-              await seedCloudDatabase(true);
+              if (isCloudConnected && db && currentUser) {
+                await seedCloudDatabase(true);
+              } else {
+                const currentTab = state.activeTab;
+                state = createSeedData();
+                state.activeTab = currentTab;
+                renderAll();
+              }
               showToast('تمت استعادة البيانات التجريبية بنجاح', 'success');
             }
           );
