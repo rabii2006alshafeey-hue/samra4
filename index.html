@@ -77,10 +77,19 @@
     /* تنسيق الطباعة الخاص بالفاتورة على ورقة A4 */
     @page {
       size: A4 portrait;
-      margin: 8mm;
+      margin: 6mm;
     }
 
     @media print {
+      html,
+      body {
+        width: 100% !important;
+        max-width: 100% !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        background: #ffffff !important;
+        overflow: visible !important;
+      }
       body * {
         visibility: hidden;
       }
@@ -89,33 +98,58 @@
         visibility: visible;
       }
       #invoice-print-modal {
-        position: fixed;
-        inset: 0;
+        position: static !important;
+        inset: auto !important;
+        width: 100% !important;
+        max-width: 100% !important;
         background: #ffffff !important;
         padding: 0 !important;
         margin: 0 !important;
         display: block !important;
         overflow: visible !important;
       }
+      #invoice-print-modal > div {
+        width: 100% !important;
+        max-width: 100% !important;
+        margin: 0 !important;
+        padding: 0 !important;
+      }
       .no-print {
         display: none !important;
       }
       #invoice-scale-wrapper {
         width: 100% !important;
+        max-width: 100% !important;
         height: auto !important;
         overflow: visible !important;
+        display: block !important;
       }
       #invoice-printable-sheet {
         box-shadow: none !important;
         border: none !important;
-        max-width: 100% !important;
         width: 100% !important;
-        min-height: 278mm !important;
+        min-width: 0 !important;
+        max-width: 100% !important;
+        min-height: 270mm !important;
         transform: none !important;
-        margin: 0 auto !important;
+        zoom: 1 !important;
+        margin: 0 !important;
         padding: 0 !important;
+        box-sizing: border-box !important;
         -webkit-print-color-adjust: exact !important;
         print-color-adjust: exact !important;
+      }
+      #invoice-printable-sheet * {
+        box-sizing: border-box !important;
+      }
+      #invoice-printable-sheet table {
+        width: 100% !important;
+        table-layout: auto !important;
+        font-size: 11px !important;
+      }
+      #invoice-printable-sheet th,
+      #invoice-printable-sheet td {
+        padding: 5px 4px !important;
       }
     }
   </style>
@@ -1851,8 +1885,19 @@
 
       document.getElementById('close-print-modal-btn').addEventListener('click', closeInvoicePrintModal);
       document.getElementById('trigger-window-print-btn').addEventListener('click', () => {
+        const wrapper = document.getElementById('invoice-scale-wrapper');
+        const sheet = document.getElementById('invoice-printable-sheet');
+        if (sheet) sheet.style.transform = 'none';
+        if (wrapper) wrapper.style.height = 'auto';
         window.print();
       });
+      window.addEventListener('beforeprint', () => {
+        const wrapper = document.getElementById('invoice-scale-wrapper');
+        const sheet = document.getElementById('invoice-printable-sheet');
+        if (sheet) sheet.style.transform = 'none';
+        if (wrapper) wrapper.style.height = 'auto';
+      });
+      window.addEventListener('afterprint', fitInvoicePreviewToScreen);
       window.addEventListener('resize', fitInvoicePreviewToScreen);
       // استعادة البيانات التجريبية
       document.getElementById('reset-data-btn').addEventListener('click', () => {
