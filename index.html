@@ -667,9 +667,9 @@
             </div>
           </div>
 
-          <!-- جدول الأصناف بالأعمدة السبعة المطابقة للصورة + العلامة المائية وتوقيع المعتمد -->
+          <!-- جدول الأصناف بالأعمدة السبعة المطابقة للصورة + العلامة المائية -->
           <div class="px-6">
-            <div class="relative border border-[#122e6b] bg-[#f8fbff] min-h-[132mm] flex flex-col justify-between overflow-hidden">
+            <div class="relative border border-[#122e6b] bg-[#f8fbff] min-h-[126mm] flex flex-col justify-between overflow-hidden">
               <!-- علامة مائية خفيفة لشاحنة في منتصف الجدول -->
               <div class="pointer-events-none absolute inset-0 flex items-center justify-center opacity-[0.07]">
                 <svg viewBox="0 0 260 110" class="w-80 h-auto" fill="#122e6b" xmlns="http://www.w3.org/2000/svg">
@@ -696,70 +696,70 @@
               </table>
             </div>
           </div>
+          </div>
+
+          <!-- التذييل السفلي: صناديق المجاميع والتفقيط وشريط العنوان -->
+          <div class="pt-3">
+            <div class="px-6 pb-3 grid grid-cols-12 items-center gap-3 text-xs font-extrabold">
+              <!-- صندوق الرصيد (يمين) -->
+              <div class="col-span-4 border border-[#122e6b]">
+                <div class="grid grid-cols-2 border-b border-[#122e6b]">
+                  <span class="bg-[#163a84] text-white py-1 px-2 text-center">الرصيد السابق</span>
+                  <span class="py-1 px-2 text-center font-mono text-slate-900">0.000</span>
+                </div>
+                <div class="grid grid-cols-2 border-b border-[#122e6b]">
+                  <span class="bg-[#163a84] text-white py-1 px-2 text-center">قيمة الفاتورة</span>
+                  <span id="print-inv-box-value" class="py-1 px-2 text-center font-mono text-slate-900">0.000</span>
+                </div>
+                <div class="grid grid-cols-2">
+                  <span class="bg-[#163a84] text-white py-1 px-2 text-center">الرصيد الحالي</span>
+                  <span id="print-inv-box-current" class="py-1 px-2 text-center font-mono text-slate-900">0.000</span>
+                </div>
+              </div>
+
+              <!-- التفقيط والضريبة (وسط) -->
+              <div class="col-span-4 text-center space-y-2 px-1">
+                <p class="text-[11px] font-bold text-slate-600">السعر شامل ضريبة المبيعات</p>
+                <p id="print-inv-words" class="text-xs font-black text-slate-900 leading-relaxed"></p>
+              </div>
+
+              <!-- صندوق المجموع والضريبة والإجمالي (يسار) -->
+              <div class="col-span-4 border border-[#122e6b]">
+                <div class="grid grid-cols-2 border-b border-[#122e6b]">
+                  <span class="bg-[#163a84] text-white py-1 px-2 text-center">المجموع</span>
+                  <span id="print-inv-subtotal" class="py-1 px-2 text-center font-mono text-slate-900">0.000</span>
+                </div>
+                <div class="grid grid-cols-2 border-b border-[#122e6b]">
+                  <span class="bg-[#163a84] text-white py-1 px-2 text-center">ضريبة المبيعات</span>
+                  <span id="print-inv-tax" class="py-1 px-2 text-center font-mono text-slate-900">0.000</span>
+                </div>
+                <div class="grid grid-cols-2">
+                  <span class="bg-[#163a84] text-white py-1 px-2 text-center">الإجمالي</span>
+                  <span id="print-inv-total" class="py-1 px-2 text-center font-mono font-black text-slate-950">0.000</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- شريط Auto truck -->
+            <div class="py-1.5 text-center border-t border-slate-200 bg-white">
+              <span class="text-xl font-black text-[#122e6b] tracking-wider" dir="ltr">≡ Auto truck ≡</span>
+            </div>
+
+            <!-- الشريط الأزرق السفلي للعنوان والهواتف -->
+            <div class="bg-[#163a84] text-white px-6 py-2.5 text-center space-y-1">
+              <div class="flex items-center justify-center gap-4 text-sm font-extrabold">
+                <span>عمان - أبو علندا - خلف محطة المشراوي</span>
+                <span>|</span>
+                <span dir="ltr">📞 0792056165</span>
+                <span>|</span>
+                <span dir="ltr">☎️ 06 412 5771</span>
+              </div>
+              <p class="text-[11px] font-semibold text-blue-100" dir="ltr">
+                Amman - Abu Alanda - Behind Al-Mashharawi Station - P.O.Box 52 Amman Abu Alanda 11592 Jordan
+              </p>
+            </div>
+          </div>
         </div>
-
-        <!-- التذييل السفلي: صناديق المجاميع والتفقيط وشريط العنوان -->
-        <div class="pt-3">
-          <div class="px-6 pb-3 grid grid-cols-12 items-center gap-3 text-xs font-extrabold">
-            <!-- صندوق الرصيد (يمين) -->
-            <div class="col-span-4 border border-[#122e6b]">
-              <div class="grid grid-cols-2 border-b border-[#122e6b]">
-                <span class="bg-[#163a84] text-white py-1 px-2 text-center">الرصيد السابق</span>
-                <span class="py-1 px-2 text-center font-mono text-slate-900">0.000</span>
-              </div>
-              <div class="grid grid-cols-2 border-b border-[#122e6b]">
-                <span class="bg-[#163a84] text-white py-1 px-2 text-center">قيمة الفاتورة</span>
-                <span id="print-inv-box-value" class="py-1 px-2 text-center font-mono text-slate-900">0.000</span>
-              </div>
-              <div class="grid grid-cols-2">
-                <span class="bg-[#163a84] text-white py-1 px-2 text-center">الرصيد الحالي</span>
-                <span id="print-inv-box-current" class="py-1 px-2 text-center font-mono text-slate-900">0.000</span>
-              </div>
-            </div>
-
-            <!-- التفقيط والضريبة (وسط) -->
-            <div class="col-span-4 text-center space-y-2 px-1">
-              <p class="text-[11px] font-bold text-slate-600">السعر شامل ضريبة المبيعات</p>
-              <p id="print-inv-words" class="text-xs font-black text-slate-900 leading-relaxed"></p>
-            </div>
-
-            <!-- صندوق المجموع والضريبة والإجمالي (يسار) -->
-            <div class="col-span-4 border border-[#122e6b]">
-              <div class="grid grid-cols-2 border-b border-[#122e6b]">
-                <span class="bg-[#163a84] text-white py-1 px-2 text-center">المجموع</span>
-                <span id="print-inv-subtotal" class="py-1 px-2 text-center font-mono text-slate-900">0.000</span>
-              </div>
-              <div class="grid grid-cols-2 border-b border-[#122e6b]">
-                <span class="bg-[#163a84] text-white py-1 px-2 text-center">ضريبة المبيعات</span>
-                <span id="print-inv-tax" class="py-1 px-2 text-center font-mono text-slate-900">0.000</span>
-              </div>
-              <div class="grid grid-cols-2">
-                <span class="bg-[#163a84] text-white py-1 px-2 text-center">الإجمالي</span>
-                <span id="print-inv-total" class="py-1 px-2 text-center font-mono font-black text-slate-950">0.000</span>
-              </div>
-            </div>
-          </div>
-
-          <!-- شريط Auto truck -->
-          <div class="py-1.5 text-center border-t border-slate-200 bg-white">
-            <span class="text-xl font-black text-[#122e6b] tracking-wider" dir="ltr">≡ Auto truck ≡</span>
-          </div>
-
-          <!-- الشريط الأزرق السفلي للعنوان والهواتف -->
-          <div class="bg-[#163a84] text-white px-6 py-2.5 text-center space-y-1">
-            <div class="flex items-center justify-center gap-4 text-sm font-extrabold">
-              <span>عمان - أبو علندا - خلف محطة المشراوي</span>
-              <span>|</span>
-              <span dir="ltr">📞 0792056165</span>
-              <span>|</span>
-              <span dir="ltr">☎️ 06 412 5771</span>
-            </div>
-            <p class="text-[11px] font-semibold text-blue-100" dir="ltr">
-              Amman - Abu Alanda - Behind Al-Mashharawi Station - P.O.Box 52 Amman Abu Alanda 11592 Jordan
-            </p>
-          </div>
-        </div>
-      </div>
       </div>
     </div>
   </div>
